@@ -1,7 +1,8 @@
 local _, addon = ...
 BetterSettingUtils = {}
 
--- Register
+-- Register the default Settings Table, if the AddOn has provides
+-- a addon.Settings table this function isn't needed.
 function BetterSettingUtils.RegisterDefaultSettings(table)
     if table ~= nil and addon.Settings == nil then
         addon.Settings = table
@@ -63,5 +64,36 @@ function BetterSettingUtils.CreateAddonSetting(category, key, lang, character)
         setting:SetValueChangedCallback(function(s, v) settingDB[s:GetVariable()] = v end)
 
         return setting
+    end
+end
+
+-- Create the main category and layout for the AddOn
+---@param name string
+function BetterSettingUtils.CreateMainCategoryAndLayout(name)
+    if addon.SettingCategories == nil then
+        addon.SettingCategories = {}
+    end
+
+    if name ~= nil and name ~= "" then
+        local category, layout = Settings.RegisterVerticalLayoutCategory(name)
+        addon.SettingCategories["main"] = {
+            category = category,
+            layout = layout
+        }
+
+        return category, layout
+    end
+end
+
+function BetterSettingUtils.CreateSubCategoryAndLayout(category, name)
+    if category ~= nil and name ~= nil and name ~= "" then
+        local subcategory, layout = Settings.RegisterVerticalLayoutSubcategory(category, name)
+        addon.SettingCategories[name] = {
+            parent = category,
+            category = subcategory,
+            layout = layout
+        }
+
+        return subcategory, layout
     end
 end
